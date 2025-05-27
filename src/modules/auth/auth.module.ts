@@ -8,7 +8,7 @@ import { JwtStrategy } from './jwt.strategy';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { User } from 'src/models/user.model';
-import { UserRepository } from './user.repository';
+import { UserRepository } from './repositories/user.repository';
 
 @Module({
   imports: [

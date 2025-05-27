@@ -1,8 +1,9 @@
-import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { UserRepository } from './user.repository';
-import { User } from '../models/user.model';
+import { UserRepository } from './repositories/user.repository';
+import { User } from '../../models/user.model';
+import { RpcException } from '@nestjs/microservices';
 
 @Injectable()
 export class AuthService {
@@ -14,7 +15,7 @@ export class AuthService {
   async signup(email: string, password: string) {
     const existing = await this.userRepository.findByEmail(email);
     if (existing) {
-      throw new ConflictException('Email already in use');
+      throw new RpcException('Email already in use');
     }
 
     const hashed = await bcrypt.hash(password, 10);
@@ -41,12 +42,21 @@ export class AuthService {
 
   async validateUser(email: string, password: string): Promise<User> {
     const user = await this.userRepository.findByEmail(email);
-    if (!user) throw new UnauthorizedException('Invalid credentials');
+    if (!user) throw new RpcException('Invalid credentials');
 
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) throw new UnauthorizedException('Invalid credentials');
+    if (!isMatch) throw new RpcException('Invalid credentials');
 
     return user;
+  }
+
+  verifyToken(token: string) {
+    try {
+      const payload = this.jwtService.verify(token);
+      return payload;
+    } catch (error) {
+      throw new RpcException('Invalid or expired token');
+    }
   }
 }
 
