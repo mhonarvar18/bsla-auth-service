@@ -8,7 +8,7 @@ import { User } from './models/user.model';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
+    ConfigModule.forRoot({ isGlobal: true, envFilePath: '.env' }),
     SequelizeModule.forRoot({
       dialect: 'mysql',
       host: process.env.DB_HOST,
