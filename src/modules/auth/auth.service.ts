@@ -58,5 +58,15 @@ export class AuthService {
       throw new RpcException('Invalid or expired token');
     }
   }
+
+  generateToken(payload: { id: number }): string {
+    return this.jwtService.sign(
+      { userId: payload.id },
+      {
+        secret: process.env.JWT_SECRET,
+        expiresIn: process.env.JWT_EXPIRES_IN || '1d',
+      },
+    );
+  }
 }
 
